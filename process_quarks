@@ -1,0 +1,2 @@
+ #!/bin/bash
+ sqlite3 whispers.db "SELECT quark FROM quarks WHERE timestamp >= datetime('now', '-1 day');"|xargs -n1 -I% bash spellbook "%"
