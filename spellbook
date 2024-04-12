@@ -1,0 +1,29 @@
+# Create the SQLite database and table if they do not exist
+sqlite3 whispers.db "CREATE TABLE IF NOT EXISTS translations (id INTEGER PRIMARY KEY, translated_text TEXT, timestamp DATETIME, char_count INTEGER);"
+
+# Use AWS CLI to translate text and extract with jq
+translated_text=$(aws translate translate-text --source-language-code "en" --target-language-code "he" --text "$1" --output json | jq -r '.TranslatedText')
+
+# Escape single quotes by replacing each ' with '' (SQL standard for escaping quotes within single-quoted strings)
+safe_translated_text=$(echo "$translated_text" | sed "s/'/''/g")
+
+# Check if translation was successful
+if [ -z "$safe_translated_text" ]; then
+    echo "Translation failed or text was empty."
+    exit 1
+fi
+
+# Get current timestamp
+current_timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+
+# Calculate the number of characters in the translated text
+char_count=${#translated_text}
+
+# Insert data into SQLite database using a safely quoted string
+sqlite3 whispers.db "INSERT INTO translations (translated_text, timestamp, char_count) VALUES ('$safe_translated_text', '$current_timestamp', $char_count);"
+
+# Output the results
+echo "Translated Text: $translated_text"
+echo "Timestamp: $current_timestamp"
+echo "Character Count: $char_count"
+echo "Data inserted successfully into the database."
