@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#run this command after sqlite3 whispers.db "select translated_text from translations;" > {month}_hebrew.txt
+awk '{
+    if ((NR % 3) == 1) line = $0;  # For the first line in a group of three, store it in 'line'
+    else if ((NR % 3) == 2) line = line " " $0;  # For the second line, append it to 'line'
+    else print line " " $0;  # For the third line, append and print the whole line
+}' "$1"
