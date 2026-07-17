@@ -1,4 +1,4 @@
-# 🪄 Spellbook
+# 🪄 Spellbook Engine
 
 > A modular knowledge engine for capturing, translating, organizing, and exploring ideas.
 
